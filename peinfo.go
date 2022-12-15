@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mel2oo/peinfo/resource"
 	"github.com/saferwall/pe"
 	"github.com/vimeo/go-magic/magic"
 )
 
 type PEInfo struct {
 	*pe.File
+	Version   resource.VersionResources
 	Imports   []Import
 	Resources []Resource
 	Sections  []Section
@@ -33,6 +35,12 @@ func New(path string) (*PEInfo, error) {
 	peinfo.ParseExport()
 	peinfo.ParseSection()
 	peinfo.ParseResource()
+
+	rc := resource.NewReader()
+	rcinfo, err := rc.Read(path)
+	if err == nil {
+		peinfo.Version = rcinfo
+	}
 
 	return &peinfo, nil
 }
