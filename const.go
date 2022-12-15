@@ -226,3 +226,106 @@ var SubLanguageTypeName = map[string]uint32{
 	"SUBLANG_GAELIC_SCOTTISH":            0x02,
 	"SUBLANG_GAELIC_MANX":                0x03,
 }
+
+const (
+	// https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#section-flags
+	IMAGE_SCN_MEM_EXECUTE = 0x20000000
+	IMAGE_SCN_MEM_READ    = 0x40000000
+	IMAGE_SCN_MEM_WRITE   = 0x80000000
+)
+
+var (
+	// https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#machine-types
+	IMAGE_FILE_MACHINE_UNKNOWN     uint16 = 0x0
+	IMAGE_FILE_MACHINE_AM33        uint16 = 0x1d3
+	IMAGE_FILE_MACHINE_AMD64       uint16 = 0x8664
+	IMAGE_FILE_MACHINE_ARM         uint16 = 0x1c0
+	IMAGE_FILE_MACHINE_ARM64       uint16 = 0xaa64
+	IMAGE_FILE_MACHINE_ARMNT       uint16 = 0x1c4
+	IMAGE_FILE_MACHINE_EBC         uint16 = 0xebc
+	IMAGE_FILE_MACHINE_I386        uint16 = 0x14c
+	IMAGE_FILE_MACHINE_IA64        uint16 = 0x200
+	IMAGE_FILE_MACHINE_LOONGARCH32 uint16 = 0x6232
+	IMAGE_FILE_MACHINE_LOONGARCH64 uint16 = 0x6264
+	IMAGE_FILE_MACHINE_M32R        uint16 = 0x9041
+	IMAGE_FILE_MACHINE_MIPS16      uint16 = 0x266
+	IMAGE_FILE_MACHINE_MIPSFPU     uint16 = 0x366
+	IMAGE_FILE_MACHINE_MIPSFPU16   uint16 = 0x466
+	IMAGE_FILE_MACHINE_POWERPC     uint16 = 0x1f0
+	IMAGE_FILE_MACHINE_POWERPCFP   uint16 = 0x1f1
+	IMAGE_FILE_MACHINE_R4000       uint16 = 0x166
+	IMAGE_FILE_MACHINE_RISCV32     uint16 = 0x5032
+	IMAGE_FILE_MACHINE_RISCV64     uint16 = 0x5064
+	IMAGE_FILE_MACHINE_RISCV128    uint16 = 0x5128
+	IMAGE_FILE_MACHINE_SH3         uint16 = 0x1a2
+	IMAGE_FILE_MACHINE_SH3DSP      uint16 = 0x1a3
+	IMAGE_FILE_MACHINE_SH4         uint16 = 0x1a6
+	IMAGE_FILE_MACHINE_SH5         uint16 = 0x1a8
+	IMAGE_FILE_MACHINE_THUMB       uint16 = 0x1c2
+	IMAGE_FILE_MACHINE_WCEMIPSV2   uint16 = 0x169
+
+	MachineTypeDesc = map[uint16]string{
+		IMAGE_FILE_MACHINE_UNKNOWN:     "The content of this field is assumed to be applicable to any machine type",
+		IMAGE_FILE_MACHINE_AM33:        "Matsushita AM33",
+		IMAGE_FILE_MACHINE_AMD64:       "x64",
+		IMAGE_FILE_MACHINE_ARM:         "ARM little endian",
+		IMAGE_FILE_MACHINE_ARM64:       "ARM64 little endian",
+		IMAGE_FILE_MACHINE_ARMNT:       "ARM Thumb-2 little endian",
+		IMAGE_FILE_MACHINE_EBC:         "EFI byte code",
+		IMAGE_FILE_MACHINE_I386:        "Intel 386 or later processors and compatible processors",
+		IMAGE_FILE_MACHINE_IA64:        "Intel Itanium processor family",
+		IMAGE_FILE_MACHINE_LOONGARCH32: "LoongArch 32-bit processor family",
+		IMAGE_FILE_MACHINE_LOONGARCH64: "LoongArch 64-bit processor family",
+		IMAGE_FILE_MACHINE_M32R:        "Mitsubishi M32R little endian",
+		IMAGE_FILE_MACHINE_MIPS16:      "MIPS16",
+		IMAGE_FILE_MACHINE_MIPSFPU:     "MIPS with FPU",
+		IMAGE_FILE_MACHINE_MIPSFPU16:   "MIPS16 with FPU",
+		IMAGE_FILE_MACHINE_POWERPC:     "Power PC little endian",
+		IMAGE_FILE_MACHINE_POWERPCFP:   "Power PC with floating point support",
+		IMAGE_FILE_MACHINE_R4000:       "MIPS little endian",
+		IMAGE_FILE_MACHINE_RISCV32:     "RISC-V 32-bit address space",
+		IMAGE_FILE_MACHINE_RISCV64:     "RISC-V 64-bit address space",
+		IMAGE_FILE_MACHINE_RISCV128:    "RISC-V 128-bit address space",
+		IMAGE_FILE_MACHINE_SH3:         "Hitachi SH3",
+		IMAGE_FILE_MACHINE_SH3DSP:      "Hitachi SH3 DSP",
+		IMAGE_FILE_MACHINE_SH4:         "Hitachi SH4",
+		IMAGE_FILE_MACHINE_SH5:         "Hitachi SH5",
+		IMAGE_FILE_MACHINE_THUMB:       "Thumb",
+		IMAGE_FILE_MACHINE_WCEMIPSV2:   "MIPS little-endian WCE v2",
+	}
+)
+
+var (
+	// https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#windows-subsystem
+	IMAGE_SUBSYSTEM_UNKNOWN                  uint16 = 0
+	IMAGE_SUBSYSTEM_NATIVE                   uint16 = 1
+	IMAGE_SUBSYSTEM_WINDOWS_GUI              uint16 = 2
+	IMAGE_SUBSYSTEM_WINDOWS_CUI              uint16 = 3
+	IMAGE_SUBSYSTEM_OS2_CUI                  uint16 = 5
+	IMAGE_SUBSYSTEM_POSIX_CUI                uint16 = 7
+	IMAGE_SUBSYSTEM_NATIVE_WINDOWS           uint16 = 8
+	IMAGE_SUBSYSTEM_WINDOWS_CE_GUI           uint16 = 9
+	IMAGE_SUBSYSTEM_EFI_APPLICATION          uint16 = 10
+	IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER  uint16 = 11
+	IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER       uint16 = 12
+	IMAGE_SUBSYSTEM_EFI_ROM                  uint16 = 13
+	IMAGE_SUBSYSTEM_XBOX                     uint16 = 14
+	IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION uint16 = 16
+
+	SubsystemTypeDesc = map[uint16]string{
+		IMAGE_SUBSYSTEM_UNKNOWN:                  "An unknown subsystem",
+		IMAGE_SUBSYSTEM_NATIVE:                   "Device drivers and native Windows processes",
+		IMAGE_SUBSYSTEM_WINDOWS_GUI:              "The Windows graphical user interface (GUI) subsystem",
+		IMAGE_SUBSYSTEM_WINDOWS_CUI:              "The Windows character subsystem",
+		IMAGE_SUBSYSTEM_OS2_CUI:                  "The OS/2 character subsystem",
+		IMAGE_SUBSYSTEM_POSIX_CUI:                "The Posix character subsystem",
+		IMAGE_SUBSYSTEM_NATIVE_WINDOWS:           "Native Win9x driver",
+		IMAGE_SUBSYSTEM_WINDOWS_CE_GUI:           "Windows CE",
+		IMAGE_SUBSYSTEM_EFI_APPLICATION:          "An Extensible Firmware Interface (EFI) application",
+		IMAGE_SUBSYSTEM_EFI_BOOT_SERVICE_DRIVER:  "An EFI driver with boot services",
+		IMAGE_SUBSYSTEM_EFI_RUNTIME_DRIVER:       "An EFI driver with run-time services",
+		IMAGE_SUBSYSTEM_EFI_ROM:                  "An EFI ROM image",
+		IMAGE_SUBSYSTEM_XBOX:                     "XBOX",
+		IMAGE_SUBSYSTEM_WINDOWS_BOOT_APPLICATION: "Windows boot application.",
+	}
+)
