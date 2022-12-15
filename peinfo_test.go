@@ -1,6 +1,7 @@
 package peinfo
 
 import (
+	"encoding/json"
 	"fmt"
 	"testing"
 )
@@ -11,7 +12,8 @@ func TestPeinfo(t *testing.T) {
 		t.Fail()
 	}
 
-	fmt.Println(peinfo)
+	data, _ := json.Marshal(peinfo)
+	fmt.Println(string(data))
 }
 
 func TestPeinfo2(t *testing.T) {
@@ -20,5 +22,6 @@ func TestPeinfo2(t *testing.T) {
 		t.Fail()
 	}
 
-	fmt.Println(peinfo)
+	data, _ := json.Marshal(peinfo)
+	fmt.Println(string(data))
 }

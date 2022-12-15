@@ -12,12 +12,13 @@ import (
 )
 
 type PEInfo struct {
-	*pe.File
-	Version   resource.VersionResources
-	Imports   []Import
-	Resources []Resource
-	Sections  []Section
-	Exports   []Function
+	*pe.File  `json:"-"`
+	Version   resource.VersionResources `json:"version,omitempty"`
+	Debugs    []Debug                   `json:"debugs,omitempty"`
+	Imports   []Import                  `json:"imports,omitempty"`
+	Exports   []Function                `json:"exports,omitempty"`
+	Sections  []Section                 `json:"sections,omitempty"`
+	Resources []Resource                `json:"resources,omitempty"`
 }
 
 func New(path string) (*PEInfo, error) {
@@ -31,6 +32,7 @@ func New(path string) (*PEInfo, error) {
 	}
 
 	peinfo := PEInfo{File: pedata}
+	peinfo.ParseDebugs()
 	peinfo.ParseImport()
 	peinfo.ParseExport()
 	peinfo.ParseSection()
@@ -45,16 +47,33 @@ func New(path string) (*PEInfo, error) {
 	return &peinfo, nil
 }
 
+type Debug struct {
+	PDB  string  `json:"pdb,omitempty"`
+	GUID pe.GUID `json:"guid,omitempty"`
+}
+
+func (p *PEInfo) ParseDebugs() {
+	for _, d := range p.File.Debugs {
+		info, ok := d.Info.(pe.CvInfoPDB70)
+		if ok {
+			p.Debugs = append(p.Debugs, Debug{
+				PDB:  info.PDBFileName,
+				GUID: info.Signature,
+			})
+		}
+	}
+}
+
 type Import struct {
-	Name      string
-	Desc      string
-	Count     int
-	Functions []Function
+	Name      string     `json:"name,omitempty"`
+	Desc      string     `json:"desc,omitempty"`
+	Count     int        `json:"count,omitempty"`
+	Functions []Function `json:"functions,omitempty"`
 }
 
 type Function struct {
-	Name    string `json:"name"`
-	Address string `json:"address"`
+	Name    string `json:"name,omitempty"`
+	Address string `json:"address,omitempty"`
 	Index   uint32 `json:"index,omitempty"`
 }
 
@@ -90,12 +109,12 @@ func (p *PEInfo) ParseExport() {
 }
 
 type Section struct {
-	Name string
-	VA   string
-	VS   string
-	PA   string
-	PS   string
-	Hash string
+	Name string `json:"name,omitempty"`
+	VA   string `json:"va,omitempty"`
+	VS   string `json:"vs,omitempty"`
+	PA   string `json:"pa,omitempty"`
+	PS   string `json:"ps,omitempty"`
+	Hash string `json:"hash,omitempty"`
 }
 
 func (p *PEInfo) ParseSection() {
@@ -120,13 +139,13 @@ func (p *PEInfo) ParseSection() {
 }
 
 type Resource struct {
-	Name        string
-	Filetype    string
-	Size        string
-	Offset      string
-	Language    string
-	SubLanguage string
-	data        []byte
+	Name        string `json:"name,omitempty"`
+	Filetype    string `json:"filetype,omitempty"`
+	Size        string `json:"size,omitempty"`
+	Offset      string `json:"offset,omitempty"`
+	Language    string `json:"language,omitempty"`
+	SubLanguage string `json:"sub-language,omitempty"`
+	data        []byte `json:"-"`
 }
 
 func (p *PEInfo) ParseResource() {
