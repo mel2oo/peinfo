@@ -89,8 +89,8 @@ func (p *PEInfo) ParseHeader() {
 }
 
 type Debug struct {
-	PDB  string  `json:"pdb,omitempty"`
-	GUID pe.GUID `json:"guid,omitempty"`
+	PDB  string `json:"pdb,omitempty"`
+	GUID string `json:"guid,omitempty"`
 }
 
 func (p *PEInfo) ParseDebugs() {
@@ -99,10 +99,14 @@ func (p *PEInfo) ParseDebugs() {
 		if ok {
 			p.Debugs = append(p.Debugs, Debug{
 				PDB:  info.PDBFileName,
-				GUID: info.Signature,
+				GUID: parseGUID(info.Signature),
 			})
 		}
 	}
+}
+
+func parseGUID(guid pe.GUID) string {
+	return fmt.Sprintf("%x-%x-%x-%s", guid.Data1, guid.Data2, guid.Data3, hex.EncodeToString(guid.Data4[:]))
 }
 
 type Import struct {
