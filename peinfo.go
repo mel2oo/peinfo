@@ -28,6 +28,7 @@ type PEInfo struct {
 		NumberOfSections    int    `json:"number_of_sections,omitempty"`
 		LinkerVersion       string `json:"linker_version,omitempty"`
 	} `json:"header,omitempty"`
+	Signed    SignedInfo                `json:"signed,omitempty"`
 	Version   resource.VersionResources `json:"version,omitempty"`
 	Debugs    []Debug                   `json:"debugs,omitempty"`
 	Imports   []Import                  `json:"imports,omitempty"`
@@ -48,6 +49,7 @@ func New(path string) (*PEInfo, error) {
 
 	peinfo := PEInfo{File: pedata}
 	peinfo.ParseHeader()
+	peinfo.ParseSigned()
 	peinfo.ParseDebugs()
 	peinfo.ParseImport()
 	peinfo.ParseExport()
@@ -86,6 +88,18 @@ func (p *PEInfo) ParseHeader() {
 	p.Header.TimeDateStamp = tm.Format("2006-01-02 15:04:05")
 	p.Header.ImageBase = fmt.Sprintf("0x%08x", p.imageBase)
 	p.Header.NumberOfSections = int(p.File.NtHeader.FileHeader.NumberOfSections)
+}
+
+type SignedInfo struct {
+	Subject string `json:"subject,omitempty"`
+	Issuer  string `json:"issuer,omitempty"`
+}
+
+func (p *PEInfo) ParseSigned() {
+	if p.File.Certificates.Info.Subject != "" {
+		p.Signed.Subject = p.File.Certificates.Info.Subject
+		p.Signed.Issuer = p.File.Certificates.Info.Issuer
+	}
 }
 
 type Debug struct {
