@@ -102,10 +102,12 @@ func (r *reader) readUTF16String(rva uint32) (string, error) {
 	}
 	n, err := r.f.ReadAt(data, offset)
 	if err != nil {
-		if err == io.EOF {
+		if err == io.EOF && n <= 0 {
 			return "", nil
 		}
-		return "", err
+		if err != io.EOF {
+			return "", err
+		}
 	}
 	idx := bytes.Index(data[:n], []byte{0, 0})
 	if idx < 0 {
