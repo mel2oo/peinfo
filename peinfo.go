@@ -55,6 +55,7 @@ func New(path string) (*PEInfo, error) {
 	peinfo.ParseExport()
 	peinfo.ParseSection()
 	peinfo.ParseResource()
+	pedata.Close()
 
 	rc := resource.NewReader()
 	rcinfo, err := rc.Read(path)
@@ -187,11 +188,11 @@ func (p *PEInfo) ParseSection() {
 		h.Write(data)
 
 		if p.entryPoint >= s.Header.VirtualAddress && p.entryPoint <= s.Header.VirtualAddress+s.Header.VirtualSize {
-			p.Header.EntryPointInSection = s.NameString()
+			p.Header.EntryPointInSection = s.String()
 		}
 
 		p.Sections = append(p.Sections, Section{
-			Name:    s.NameString(),
+			Name:    s.String(),
 			VA:      fmt.Sprintf("0x%08x", s.Header.VirtualAddress),
 			VS:      fmt.Sprintf("0x%08x", s.Header.VirtualSize),
 			PA:      fmt.Sprintf("0x%08x", s.Header.PointerToRawData),
