@@ -28,6 +28,7 @@ type PEInfo struct {
 		NumberOfSections    int    `json:"number_of_sections,omitempty"`
 		LinkerVersion       string `json:"linker_version,omitempty"`
 	} `json:"header,omitempty"`
+	Signed    SignedInfo                `json:"signed,omitempty"`
 	Version   resource.VersionResources `json:"version,omitempty"`
 	Debugs    []Debug                   `json:"debugs,omitempty"`
 	Imports   []Import                  `json:"imports,omitempty"`
@@ -48,11 +49,13 @@ func New(path string) (*PEInfo, error) {
 
 	peinfo := PEInfo{File: pedata}
 	peinfo.ParseHeader()
+	peinfo.ParseSigned()
 	peinfo.ParseDebugs()
 	peinfo.ParseImport()
 	peinfo.ParseExport()
 	peinfo.ParseSection()
 	peinfo.ParseResource()
+	pedata.Close()
 
 	rc := resource.NewReader()
 	rcinfo, err := rc.Read(path)
@@ -88,9 +91,21 @@ func (p *PEInfo) ParseHeader() {
 	p.Header.NumberOfSections = int(p.File.NtHeader.FileHeader.NumberOfSections)
 }
 
+type SignedInfo struct {
+	Subject string `json:"subject,omitempty"`
+	Issuer  string `json:"issuer,omitempty"`
+}
+
+func (p *PEInfo) ParseSigned() {
+	if p.File.Certificates.Info.Subject != "" {
+		p.Signed.Subject = p.File.Certificates.Info.Subject
+		p.Signed.Issuer = p.File.Certificates.Info.Issuer
+	}
+}
+
 type Debug struct {
-	PDB  string  `json:"pdb,omitempty"`
-	GUID pe.GUID `json:"guid,omitempty"`
+	PDB  string `json:"pdb,omitempty"`
+	GUID string `json:"guid,omitempty"`
 }
 
 func (p *PEInfo) ParseDebugs() {
@@ -99,10 +114,14 @@ func (p *PEInfo) ParseDebugs() {
 		if ok {
 			p.Debugs = append(p.Debugs, Debug{
 				PDB:  info.PDBFileName,
-				GUID: info.Signature,
+				GUID: parseGUID(info.Signature),
 			})
 		}
 	}
+}
+
+func parseGUID(guid pe.GUID) string {
+	return fmt.Sprintf("%x-%x-%x-%s", guid.Data1, guid.Data2, guid.Data3, hex.EncodeToString(guid.Data4[:]))
 }
 
 type Import struct {
@@ -169,11 +188,11 @@ func (p *PEInfo) ParseSection() {
 		h.Write(data)
 
 		if p.entryPoint >= s.Header.VirtualAddress && p.entryPoint <= s.Header.VirtualAddress+s.Header.VirtualSize {
-			p.Header.EntryPointInSection = s.NameString()
+			p.Header.EntryPointInSection = s.String()
 		}
 
 		p.Sections = append(p.Sections, Section{
-			Name:    s.NameString(),
+			Name:    s.String(),
 			VA:      fmt.Sprintf("0x%08x", s.Header.VirtualAddress),
 			VS:      fmt.Sprintf("0x%08x", s.Header.VirtualSize),
 			PA:      fmt.Sprintf("0x%08x", s.Header.PointerToRawData),

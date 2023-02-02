@@ -280,7 +280,7 @@ func (r *reader) readVersionInfo(vsDir *rdir) (map[string]string, error) {
 							vers[key] = ""
 							break
 						}
-						vers[key] = value
+						vers[key] = strings.ReplaceAll(value, "�", "")
 						if str.Length == 0 {
 							entryOffset = stringTableOffset + int64(stringTable.Length)
 						} else {

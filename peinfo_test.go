@@ -17,7 +17,7 @@ func TestPeinfo(t *testing.T) {
 }
 
 func TestPeinfo2(t *testing.T) {
-	peinfo, err := New("testdata/9edc89c4489fb29a61a1e1ff66d9d49b4fb2c230d0efb323dbf1829895497ba8")
+	peinfo, err := New("testdata/7587b1e66394558c8322c404941ca5a9.bin")
 	if err != nil {
 		t.Fail()
 	}
